@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { theme } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../../store/appStore';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 export default function HomeTab() {
   const router = useRouter();
@@ -30,6 +31,16 @@ export default function HomeTab() {
           <Ionicons name="scan-outline" size={24} color={theme.colors.background} />
           <Text style={styles.buttonText}>Smart Scan Now</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.adContainer}>
+        <BannerAd
+          unitId={TestIds.BANNER}
+          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+          requestOptions={{
+            requestNonPersonalizedAdsOnly: false, // The CMP handles actual consent state
+          }}
+        />
       </View>
     </View>
   );
@@ -103,5 +114,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: theme.spacing.s,
+  },
+  adContainer: {
+    marginTop: 'auto',
+    width: '100%',
+    alignItems: 'center',
   }
 });
