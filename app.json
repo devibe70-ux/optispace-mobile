@@ -67,9 +67,7 @@
       "reactCompiler": false
     },
     "extra": {
-      "eas": {
-        "projectId": "76b3ea2d-92c6-4b95-aa66-dd8c6bc7a911"
-      }
+      "eas": {}
     }
   }
 }
