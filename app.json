@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "optispace-mobile",
+    "owner": "devibe70s-team",
     "slug": "optispace-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -64,6 +65,11 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "76b3ea2d-92c6-4b95-aa66-dd8c6bc7a911"
+      }
     }
   }
 }
