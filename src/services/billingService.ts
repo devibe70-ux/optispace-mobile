@@ -58,7 +58,7 @@ export const initiateRazorpayCheckout = (amountInINR: number, description: strin
             description: description,
             image: 'https://i.imgur.com/3g7nmJC.png',
             currency: 'INR',
-            key: 'rzp_test_YOUR_KEY_ID', // Replace with real key in production via .env
+            key: process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID || '', // Loaded securely from .env
             amount: amountInINR * 100, // Amount in paise
             name: 'De Vibe',
             theme: {color: '#2a5b8f'} // Use primary color
