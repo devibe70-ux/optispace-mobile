@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { theme } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { AdsConsent } from 'react-native-google-mobile-ads';
 
 export default function SettingsTab() {
+  const router = useRouter();
 
   const handlePrivacySettings = async () => {
     try {
@@ -17,6 +19,19 @@ export default function SettingsTab() {
   return (
     <View style={styles.container}>
       <Text style={styles.headerTitle}>Settings</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Account</Text>
+        
+        <TouchableOpacity style={styles.row} onPress={() => router.push('/subscription')}>
+          <View style={styles.rowContent}>
+            <Ionicons name="star" size={24} color={theme.colors.primary} />
+            <Text style={styles.rowText}>Upgrade to Pro</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+        </TouchableOpacity>
+        <Text style={styles.hint}>Unlock advanced analytics and insights.</Text>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Privacy</Text>
