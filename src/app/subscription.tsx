@@ -5,24 +5,30 @@ import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
 import { calculateSubscriptionTax, initiateRazorpayCheckout } from '../services/billingService';
 
-const PLAN_PRICE = 999; // Base price in INR
+const PRICING_PLANS = [
+  { id: '3m', name: '3 Months', price: 299 },
+  { id: '6m', name: '6 Months', price: 549 },
+  { id: '1y', name: '1 Year', price: 899 },
+  { id: '3y', name: '3 Years', price: 2599 },
+  { id: 'life', name: 'Lifetime', price: 4499 },
+];
 
 export default function SubscriptionScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState(PRICING_PLANS[0].id);
   const [userLocation, setUserLocation] = useState({ countryCode: 'IN', stateCode: '24' }); // Default to India/Gujarat for demo
   
-  const taxBreakdown = calculateSubscriptionTax(userLocation, PLAN_PRICE);
+  const selectedPlan = PRICING_PLANS.find(p => p.id === selectedPlanId) || PRICING_PLANS[0];
+  const taxBreakdown = calculateSubscriptionTax(userLocation, selectedPlan.price);
 
   const handleSubscribe = async () => {
     setLoading(true);
     try {
-      const result = await initiateRazorpayCheckout(taxBreakdown.finalAmount, 'De Vibe Pro Subscription');
-      // Handle success
+      const result = await initiateRazorpayCheckout(taxBreakdown.finalAmount, `De Vibe Pro - ${selectedPlan.name}`);
       alert('Subscription successful! Payment ID: ' + result.razorpay_payment_id);
       router.back();
     } catch (error: any) {
-      // Handle error or cancellation
       console.log('Payment failed or cancelled:', error);
       alert('Payment failed: ' + error.description);
     } finally {
@@ -40,26 +46,33 @@ export default function SubscriptionScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <View style={styles.planCard}>
-        <View style={styles.planHeader}>
-          <Text style={styles.planName}>Monthly Pro</Text>
-          <Text style={styles.planPrice}>₹{PLAN_PRICE}</Text>
-        </View>
-        <Text style={styles.planDescription}>
-          Unlock advanced revenue forecasting tools, brand campaign insights, and marketplace data analytics.
-        </Text>
-        <View style={styles.featureList}>
-          <Text style={styles.featureItem}>• Unlimited revenue forecasting</Text>
-          <Text style={styles.featureItem}>• Influencer marketplace access</Text>
-          <Text style={styles.featureItem}>• Priority support</Text>
-        </View>
+      <Text style={styles.description}>
+        Unlock advanced revenue forecasting tools, brand campaign insights, and marketplace data analytics.
+      </Text>
+
+      <View style={styles.plansContainer}>
+        {PRICING_PLANS.map((plan) => {
+          const isSelected = selectedPlan.id === plan.id;
+          return (
+            <TouchableOpacity
+              key={plan.id}
+              style={[styles.planCard, isSelected && styles.planCardSelected]}
+              onPress={() => setSelectedPlanId(plan.id)}
+            >
+              <View style={styles.planHeader}>
+                <Text style={[styles.planName, isSelected && styles.planNameSelected]}>{plan.name}</Text>
+                <Text style={[styles.planPrice, isSelected && styles.planPriceSelected]}>₹{plan.price}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       <View style={styles.taxCard}>
         <Text style={styles.taxTitle}>Order Summary</Text>
         <View style={styles.taxRow}>
-          <Text style={styles.taxLabel}>Base Plan</Text>
-          <Text style={styles.taxValue}>₹{PLAN_PRICE.toFixed(2)}</Text>
+          <Text style={styles.taxLabel}>{selectedPlan.name} Plan</Text>
+          <Text style={styles.taxValue}>₹{selectedPlan.price.toFixed(2)}</Text>
         </View>
         
         {taxBreakdown.cgst > 0 && (
@@ -130,42 +143,50 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.text,
   },
+  description: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    lineHeight: 24,
+  },
+  plansContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    gap: 12,
+  },
   planCard: {
     backgroundColor: theme.colors.surface,
-    margin: 20,
-    padding: 24,
-    borderRadius: 16,
-    borderWidth: 1,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 2,
     borderColor: theme.colors.border,
+  },
+  planCardSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary + '10', // Light primary background
   },
   planHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
   },
   planName: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  planNameSelected: {
     color: theme.colors.primary,
+    fontWeight: 'bold',
   },
   planPrice: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: theme.colors.text,
   },
-  planDescription: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
-    marginBottom: 20,
-    lineHeight: 24,
-  },
-  featureList: {
-    gap: 12,
-  },
-  featureItem: {
-    fontSize: 16,
-    color: theme.colors.text,
+  planPriceSelected: {
+    color: theme.colors.primary,
   },
   taxCard: {
     margin: 20,
@@ -228,6 +249,7 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
+    marginBottom: 40,
   },
   subscribeButtonDisabled: {
     opacity: 0.7,
@@ -238,3 +260,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
