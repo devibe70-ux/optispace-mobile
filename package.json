@@ -26,6 +26,7 @@
     "react-native-compressor": "^2.0.2",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-google-mobile-ads": "^16.4.0",
+    "react-native-nitro-modules": "^0.36.1",
     "react-native-razorpay": "^3.0.0",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "4.12.0",
