@@ -37,6 +37,17 @@
     "plugins": [
       "expo-router",
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "newArchEnabled": false,
+            "extraParams": [
+              "reactNativeArchitectures=armeabi-v7a,arm64-v8a"
+            ]
+          }
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
