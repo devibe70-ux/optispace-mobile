@@ -51,25 +51,73 @@ export function calculateSubscriptionTax(customerProfile: { countryCode: string;
 /**
  * Trigger the Razorpay Native Checkout UI
  */
-export const initiateRazorpayCheckout = (amountInINR: number, description: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        // Options required by Razorpay
-        var options = {
-            description: description,
-            image: 'https://i.imgur.com/3g7nmJC.png',
-            currency: 'INR',
-            key: process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID || '', // Loaded securely from .env
-            amount: amountInINR * 100, // Amount in paise
-            name: 'De Vibe',
-            theme: {color: '#2a5b8f'} // Use primary color
-        };
-
-        RazorpayCheckout.open(options).then((data: any) => {
-            // handle success
-            resolve(data);
-        }).catch((error: any) => {
-            // handle failure
-            reject(error);
+export const initiateRazorpayCheckout = async (amountInINR: number, description: string): Promise<any> => {
+    try {
+        // 1. Fetch Order ID from Secure Backend API
+        const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8081';
+        const orderResponse = await fetch(`${apiUrl}/api/create-order`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: amountInINR * 100, // convert to paise
+                currency: 'INR',
+                receipt: 'receipt_devibe_' + Date.now()
+            })
         });
-    });
+
+        if (!orderResponse.ok) {
+            throw new Error(`Failed to create order: ${await orderResponse.text()}`);
+        }
+
+        const orderData = await orderResponse.json();
+        
+        if (!orderData.order_id) {
+            throw new Error('Order ID was not returned from the server.');
+        }
+
+        // 2. Open Razorpay Checkout Modal
+        return new Promise((resolve, reject) => {
+            const options = {
+                description: description,
+                image: 'https://i.imgur.com/3g7nmJC.png',
+                currency: orderData.currency,
+                key: process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID || '', // Loaded securely from .env
+                amount: orderData.amount, // Already in paise from backend
+                order_id: orderData.order_id, // SECURE ORDER ID GENERATED ON BACKEND!
+                name: 'De Vibe',
+                theme: { color: '#2a5b8f' } // Use primary color
+            };
+
+            RazorpayCheckout.open(options).then(async (data: any) => {
+                // 3. Verify Signature on Secure Backend API
+                try {
+                    const verifyResponse = await fetch(`${apiUrl}/api/verify-payment`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: data.razorpay_order_id,
+                            razorpay_payment_id: data.razorpay_payment_id,
+                            razorpay_signature: data.razorpay_signature
+                        })
+                    });
+
+                    if (!verifyResponse.ok) {
+                        reject(new Error(`Payment Verification Failed: ${await verifyResponse.text()}`));
+                        return;
+                    }
+
+                    const verifyData = await verifyResponse.json();
+                    resolve({ ...data, verification: verifyData });
+                } catch (verifyError) {
+                    reject(verifyError);
+                }
+            }).catch((error: any) => {
+                // handle checkout failure/cancellation
+                reject(error);
+            });
+        });
+    } catch (error) {
+        console.error("Initiate Checkout Error:", error);
+        throw error;
+    }
 }
