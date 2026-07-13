@@ -11,12 +11,16 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "resourceClass": "large"
+        "env": {
+          "GRADLE_OPTS": "-Dorg.gradle.workers.max=1"
+        }
       }
     },
     "production": {
       "android": {
-        "resourceClass": "large"
+        "env": {
+          "GRADLE_OPTS": "-Dorg.gradle.workers.max=1"
+        }
       }
     }
   },
