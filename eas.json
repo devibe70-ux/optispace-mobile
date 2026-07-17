@@ -22,9 +22,17 @@
           "GRADLE_OPTS": "-Dorg.gradle.workers.max=1"
         }
       }
+    },
+    "devibe": {
+      "android": {
+        "env": {
+          "GRADLE_OPTS": "-Dorg.gradle.workers.max=1"
+        }
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {},
+    "devibe": {}
   }
 }
