@@ -29,10 +29,18 @@
           "GRADLE_OPTS": "-Dorg.gradle.workers.max=1"
         }
       }
+    },
+    "devibe70s-team": {
+      "android": {
+        "env": {
+          "GRADLE_OPTS": "-Dorg.gradle.workers.max=1"
+        }
+      }
     }
   },
   "submit": {
     "production": {},
-    "devibe": {}
+    "devibe": {},
+    "devibe70s-team": {}
   }
 }
