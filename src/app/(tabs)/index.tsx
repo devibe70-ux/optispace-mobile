@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { theme } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '../../store/appStore';
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import { AdBanner } from '../../components/ad-banner';
 
 export default function HomeTab() {
   const router = useRouter();
@@ -34,13 +34,7 @@ export default function HomeTab() {
       </View>
 
       <View style={styles.adContainer}>
-        <BannerAd
-          unitId={TestIds.BANNER}
-          size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-          requestOptions={{
-            requestNonPersonalizedAdsOnly: false, // The CMP handles actual consent state
-          }}
-        />
+        <AdBanner />
       </View>
     </View>
   );

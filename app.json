@@ -2,7 +2,7 @@
   "expo": {
     "newArchEnabled": false,
     "name": "Opticspace",
-    "owner": "devibe70s-team",
+    "owner": "devibe",
     "slug": "ai-cleaner",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,7 +13,7 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
-      "package": "com.devive.optispacemobile",
+      "package": "com.devibe.optispacemobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -24,7 +24,6 @@
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
-        "android.permission.ACCESS_MEDIA_LOCATION",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",
         "android.permission.READ_MEDIA_AUDIO"
@@ -60,7 +59,7 @@
         {
           "photosPermission": "Allow OptiSpace AI to access your photos to find duplicates.",
           "savePhotosPermission": "Allow OptiSpace AI to save compressed videos.",
-          "isAccessMediaLocationEnabled": true
+          "isAccessMediaLocationEnabled": false
         }
       ],
       [

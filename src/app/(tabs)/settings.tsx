@@ -2,7 +2,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
-import { AdsConsent } from 'react-native-google-mobile-ads';
+import { showPrivacyOptions } from '../../services/adService';
+import { ExternalLink } from '../../components/external-link';
 
 export default function SettingsTab() {
   const router = useRouter();
@@ -10,7 +11,7 @@ export default function SettingsTab() {
   const handlePrivacySettings = async () => {
     try {
       // Re-show the CMP form for CCPA/GDPR compliance
-      await AdsConsent.showPrivacyOptionsForm();
+      await showPrivacyOptions();
     } catch (error) {
       console.warn('Failed to show privacy form:', error);
     }
@@ -36,6 +37,16 @@ export default function SettingsTab() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Privacy</Text>
         
+        <ExternalLink href="https://www.devibestudio.com/privacy" asChild>
+          <TouchableOpacity style={[styles.row, { marginBottom: theme.spacing.s }]}>
+            <View style={styles.rowContent}>
+              <Ionicons name="document-text-outline" size={24} color={theme.colors.text} />
+              <Text style={styles.rowText}>Privacy Policy</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={theme.colors.textSecondary} />
+          </TouchableOpacity>
+        </ExternalLink>
+
         <TouchableOpacity style={styles.row} onPress={handlePrivacySettings}>
           <View style={styles.rowContent}>
             <Ionicons name="shield-checkmark-outline" size={24} color={theme.colors.text} />

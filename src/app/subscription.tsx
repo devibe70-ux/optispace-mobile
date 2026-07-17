@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../theme';
@@ -17,7 +17,7 @@ export default function SubscriptionScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState(PRICING_PLANS[0].id);
-  const [userLocation, setUserLocation] = useState({ countryCode: 'IN', stateCode: '24' }); // Default to India/Gujarat for demo
+  const [userLocation] = useState({ countryCode: 'IN', stateCode: '24' }); // Default to India/Gujarat for demo
   
   const selectedPlan = PRICING_PLANS.find(p => p.id === selectedPlanId) || PRICING_PLANS[0];
   const taxBreakdown = calculateSubscriptionTax(userLocation, selectedPlan.price);
@@ -26,11 +26,12 @@ export default function SubscriptionScreen() {
     setLoading(true);
     try {
       const result = await initiateRazorpayCheckout(taxBreakdown.finalAmount, `De Vibe Pro - ${selectedPlan.name}`);
-      alert('Subscription successful! Payment ID: ' + result.razorpay_payment_id);
+      Alert.alert('Subscription Successful', 'Payment ID: ' + result.razorpay_payment_id);
       router.back();
     } catch (error: any) {
       console.log('Payment failed or cancelled:', error);
-      alert('Payment failed: ' + error.description);
+      const errorMessage = error?.description || error?.message || 'Payment was cancelled or failed.';
+      Alert.alert('Payment Failed', errorMessage);
     } finally {
       setLoading(false);
     }

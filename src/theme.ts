@@ -9,6 +9,7 @@ export const theme = {
     textSecondary: '#A0B0C0',
     danger: '#FF3366',
     success: '#00E676',
+    border: '#1F3C5F',
   },
   spacing: {
     xs: 4,

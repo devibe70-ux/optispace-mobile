@@ -70,6 +70,18 @@ export class MediaScannerService {
       const prev = assets[i - 1];
       const curr = assets[i];
 
+      // Defensive checking for creationTime presence
+      if (prev.creationTime === undefined || curr.creationTime === undefined || prev.creationTime === 0 || curr.creationTime === 0) {
+        if (currentGroup.length > 1) {
+          groups.push({
+            id: currentGroup[0].id,
+            assets: [...currentGroup]
+          });
+        }
+        currentGroup = [curr];
+        continue;
+      }
+
       // creationTime is in milliseconds
       const timeDiff = Math.abs(curr.creationTime - prev.creationTime);
       
@@ -99,27 +111,27 @@ export class MediaScannerService {
   private static async findLargeVideos(assets: MediaLibrary.Asset[]): Promise<LargeVideo[]> {
     const largeVideos: LargeVideo[] = [];
     
-    // Process in chunks to avoid overwhelming the bridge
-    for (const asset of assets) {
+    // Filter first by duration > 10 seconds to avoid calling getAssetInfoAsync on non-candidate videos
+    const candidateVideos = assets.filter(asset => asset.duration && asset.duration > 10);
+    
+    for (const asset of candidateVideos) {
       try {
         const assetInfo = await MediaLibrary.getAssetInfoAsync(asset);
-        // Only consider videos larger than 10MB
-        // For local images/videos, we can estimate size or use file size if available.
-        // Actually getAssetInfoAsync returns `size` for local assets on iOS/Android in bytes. Wait, size might not always be there.
-        // Let's check size, fallback to duration * height for rough heuristic if missing.
-        let sizeMB = 0;
-        
-        // Wait, MediaLibrary.Asset has `duration` and `width`/`height`. Size is not guaranteed on all platforms in `getAssetsAsync`, but `getAssetInfoAsync` might have it.
-        // Since getAssetInfoAsync is slow for many videos, let's use a heuristic: duration > 10 seconds.
-        if (asset.duration > 10) {
-           sizeMB = Math.round((asset.duration * 1.5)); // rough estimate: 1.5MB per second of video
-           largeVideos.push({
-             asset,
-             sizeMB
-           });
-        }
+        // assetInfo.size is in bytes (available on iOS and Android)
+        const sizeBytes = (assetInfo as any).size;
+        const sizeMB = sizeBytes ? Math.round(sizeBytes / (1024 * 1024)) : Math.round(asset.duration * 1.5);
+        largeVideos.push({
+          asset,
+          sizeMB: sizeMB > 0 ? sizeMB : 1
+        });
       } catch (error) {
         console.warn('Could not get asset info for', asset.id, error);
+        // Fallback to heuristic
+        const sizeMB = Math.round(asset.duration * 1.5);
+        largeVideos.push({
+          asset,
+          sizeMB: sizeMB > 0 ? sizeMB : 1
+        });
       }
     }
     

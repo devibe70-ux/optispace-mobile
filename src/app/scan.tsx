@@ -22,7 +22,7 @@ export default function ScanScreen() {
         router.push('/results');
       }
     }
-  }, [isScanning, scanProgress, duplicateGroups, largeVideos]);
+  }, [isScanning, scanProgress, duplicateGroups, largeVideos, router]);
 
   return (
     <View style={styles.container}>
